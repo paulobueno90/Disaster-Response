@@ -26,7 +26,33 @@ Python Version: 3.8.5
 - textaugment
 
 
-### Instructions:
+### Files and Process
+
+#### Data:
+The dataset is provided by [Appen]("https://appen.com/figure-eight-is-now-appen/") (former Figure Eight):
+
+#### data/disaster_categories.csv: 
+36 categories possible for the messages
+#### data/disaster_messages.csv: 
+Disaster response messages
+
+#### Data Processing: 
+##### data/process_data.py: 
+ETL (Extract, Transform, and Load) pipeline that clean and process data from a CSV and store data in a SQLite database
+
+#### Machine Learning 
+##### models/train_classifier.py
+- Oversampling dataset minor categories with synonyms
+- It split data into training and test set
+- Create an ML pipeline that uses NLTK, multi-output classifier and Random Forest as classifier  
+- Predicts message classifications for the 36 categories (multi-output)
+
+Ps: It was not used GridSearch model, once it improved very litle(0.13%) performance with the oversampled data.
+
+### Web App: 
+- Web application that classifies messages.
+
+#### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
     - To run ETL pipeline that cleans data and stores in database
@@ -38,3 +64,8 @@ Python Version: 3.8.5
     `python run.py`
 
 3. Go to http://127.0.0.1:5000/
+
+
+### Acknowledgements
+
+Thanks Udacity for the knowledge and opportunity, the reviewers for the comments and suggestions.
