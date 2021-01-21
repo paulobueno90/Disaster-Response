@@ -35,6 +35,12 @@ def synonym_tokenize(text):
 
 
 def oversample_nlp(dataframe):
+    """
+    Oversample the miner categories using synonyms.
+
+    :param dataframe: pandas format dataframe to be oversampled
+    :return: oversampled dataframe
+    """
     obj = dataframe.mean()
     obj = obj.sort_values(ascending=False)
 
@@ -150,7 +156,7 @@ def build_model():
 
 def evaluate_model(model, X_test, y_test, category_names):
     """
-    Calculate evaluation metrics for ML model
+    Calculate and print evaluation metrics for ML model
 
         Args:
         model: Pipeline. Model for prediction
@@ -158,11 +164,8 @@ def evaluate_model(model, X_test, y_test, category_names):
         Y_test: array. Array containing actual labels.
         category_names: list of strings. List containing names for each of the predicted fields.
 
-        Returns:
-        report: dict. Dict containing the accuracy, precision, recall
-        and f1 score for a given set of actual and predicted labels.
+        Returns: None
     """
-
     y_pred = model.predict(X_test)
 
     # Calculate evaluation metrics for each set of labels
@@ -171,8 +174,10 @@ def evaluate_model(model, X_test, y_test, category_names):
         print(classification_report(list(y_test.values[:, i]), list(y_pred[:, i])))
 
 
-
 def save_model(model, model_filepath):
+    """
+        Save model to a pickle file
+    """
     with open(str(model_filepath), 'wb') as f:
         pickle.dump(model, f)
 
