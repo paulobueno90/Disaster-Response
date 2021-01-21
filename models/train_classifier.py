@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from nltk.corpus import stopwords
@@ -147,7 +148,7 @@ def build_model():
     return pipeline
 
 
-def evaluate_model(model, X_test, Y_test, category_names):
+def evaluate_model(model, X_test, y_test, category_names):
     """
     Calculate evaluation metrics for ML model
 
@@ -161,19 +162,14 @@ def evaluate_model(model, X_test, Y_test, category_names):
         report: dict. Dict containing the accuracy, precision, recall
         and f1 score for a given set of actual and predicted labels.
     """
-    report = {}
-    predicted = model.predict(X_test)
+
+    y_pred = model.predict(X_test)
 
     # Calculate evaluation metrics for each set of labels
     for i, col in enumerate(category_names):
-        accuracy = accuracy_score(Y_test[:, i], predicted[:, i])
-        precision = precision_score(Y_test[:, i], predicted[:, i])
-        recall = recall_score(Y_test[:, i], predicted[:, i])
-        f1 = f1_score(Y_test[:, i], predicted[:, i])
+        print(f'{"_" * 80}\n{col.upper():^70}\n')
+        print(classification_report(list(y_test.values[:, i]), list(y_pred[:, i])))
 
-        report[col] = {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
-
-    return report
 
 
 def save_model(model, model_filepath):
@@ -196,7 +192,7 @@ def main():
         model.fit(X_train, y_train)
         
         print('Evaluating model...')
-        #evaluate_model(model, X_test, y_test, category_names)
+        evaluate_model(model, X_test, y_test, category_names)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
@@ -212,3 +208,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
