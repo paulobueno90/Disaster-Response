@@ -7,6 +7,10 @@
 
 # Disaster Response Pipeline Project
 
+## Motivation
+
+Build a machine learn pipeline to categorize emergency messages based on the needs communicated by the sender. So this kind of tool in a disaster can make the right help come faster.
+
 ## Installation
 
 Python Version: 3.8.5
@@ -26,7 +30,7 @@ Python Version: 3.8.5
 - textaugment
 
 
-### Files and Process
+## Files and Process
 
 #### Data:
 The dataset is provided by [Appen]("https://appen.com/figure-eight-is-now-appen/") (former Figure Eight):
@@ -49,7 +53,7 @@ ETL (Extract, Transform, and Load) pipeline that clean and process data from a C
 
 Ps: It was not used GridSearch model, once it improved very litle(0.13%) performance with the oversampled data.
 
-### Web App: 
+## Web App: 
 - Web application that classifies messages.
 
 #### Instructions:
@@ -66,6 +70,6 @@ Ps: It was not used GridSearch model, once it improved very litle(0.13%) perform
 3. Go to http://127.0.0.1:5000/
 
 
-### Acknowledgements
+## Acknowledgements
 
 Thanks Udacity for the knowledge and opportunity, the reviewers for the comments and suggestions.
