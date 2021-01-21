@@ -25,24 +25,6 @@ Python Version: 3.8.5
 - sqlite3
 - textaugment
 
-The code should run using Python versions 3.*.
-## Motivation:
-
-It was done a analysis, in order to answer 3 key questions bellow.
-
-- What are the neighborhoods with the best prices?
-
-- What type of property has the best prices ?
-
-- What to expect in terms of cleaning fee and how much it increases the price on average?
-
-- When are high seasons and low seasons ?
-
-
-
-
-
-
 
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
