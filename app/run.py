@@ -24,12 +24,6 @@ app = Flask(__name__)
 engine = create_engine('sqlite:///' + '../data/disaster_data.db')
 df = pd.read_sql_table('message', engine)
 
-print(df.head())
-
-
-
-
-
 def tokenize(text):
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
