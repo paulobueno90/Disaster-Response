@@ -1,6 +1,7 @@
 import sys
 import os
 from os.path import isfile, join, isdir
+import warnings
 
 import nltk
 import numpy as np
@@ -14,17 +15,17 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, make_scorer
 
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-"""nltk.download('punkt')
+nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
-nltk.download('averaged_perceptron_tagger')"""
+nltk.download('averaged_perceptron_tagger')
 
 from textaugment import Wordnet
 
@@ -106,6 +107,13 @@ def oversample_nlp(dataframe):
 
 
 def tokenize(text):
+    """
+    Takes text and return a tokenized, cleaned and lemmatized list
+    :param
+    text: string. input text
+    :return:
+    clean_tokens: list. List of relevant words lemmatized
+    """
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
@@ -126,6 +134,14 @@ def tokenize(text):
 
 
 def load_data(database_filepath):
+    """
+    Load data from a SQL db, oversample the minor categories and return data ready to model.
+    :param database_filepath:
+    :return:
+    X: Array. Array with messages to use as input
+    Y: Array. Array containing labels
+    categories: List. List of strings containing names for each column of 'Y'
+    """
     # load data from database
     engine = create_engine('sqlite:///' + str(database_filepath))
     df = pd.read_sql_table('message', con=engine)
@@ -144,7 +160,34 @@ def load_data(database_filepath):
 
     return X, Y, categories
 
+def performance_score(y_true, y_pred):
+    """
+    Calculate median F1 score for all of the output classifiers
+
+    Args:
+    y_true: Array containing real labels.
+    y_pred: Array containing model predictied labels.
+
+    Returns:
+    score: float. Median F1 score for all of the output classifiers
+    """
+    f1_list = []
+    for i in range(np.shape(y_pred)[1]):
+        f1 = f1_score(np.array(y_true)[:, i], y_pred[:, i])
+        f1_list.append(f1)
+
+    score = np.median(f1_list)
+    return score
+
 def build_model(gridsearch=False):
+    """
+    Create a classification model
+
+    :param gridsearch: bool. Activate GridSearch, default = False
+    :return: pipeline
+    """
+
+
     # Create pipeline with Classifier
     moc = MultiOutputClassifier(RandomForestClassifier())
 
@@ -154,7 +197,19 @@ def build_model(gridsearch=False):
         ('clf', moc)
     ])
 
-    return pipeline
+    if gridsearch:
+
+        parameters = {'clf__estimator__min_samples_leaf': [1, 2, 5, 10],
+                      'clf__estimator__min_samples_split': [2, 5, 10, 15, 100]}
+
+        scorer = make_scorer(performance_score)
+
+        cv = GridSearchCV(pipeline, param_grid=parameters, scoring=scorer, verbose=10)
+
+        return cv
+
+    else:
+        return pipeline
 
 
 def evaluate_model(model, X_test, y_test, category_names):
@@ -186,6 +241,10 @@ def save_model(model, model_filepath):
 
 
 def main():
+    """
+    Runs script step by step until it saves a new trained model
+    :return: None
+    """
 
     messages_filepath = ''
     categories_filepath = ''
@@ -242,7 +301,18 @@ def main():
         X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=42)
         
         print('Building model...')
-        model = build_model()
+
+        grid_tag = False
+
+        if grid_tag:
+            model = build_model(gridsearch=grid_tag)
+        else:
+            warnings.warn("\nGridSearch is off due to timeXperformance tradeoff:\n"
+                  "Without Gridsearch it takes:\n 11 to 20 minutes to train the model in my machine and 4 minutes in Udacity Machine\n"
+                  "With Gridsearch it takes 2 hours and 28 minutes. Gridsearch with the parameters selected improved only 0.13%.\n"
+                  "If you want to test with GridSearch change the variable 'grid_tag' and assign True")
+            model = build_model(gridsearch=grid_tag)
+
         
         print('Training model...')
         model.fit(X_train, y_train)
