@@ -1,4 +1,7 @@
 import sys
+import os
+from os.path import isfile, join, isdir
+
 import nltk
 import numpy as np
 import pandas as pd
@@ -18,10 +21,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-nltk.download('punkt')
+"""nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
-nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger')"""
 
 from textaugment import Wordnet
 
@@ -36,7 +39,7 @@ def synonym_tokenize(text):
 
 def oversample_nlp(dataframe):
     """
-    Oversample the miner categories using synonyms.
+    Oversample the minor categories using synonyms.
 
     :param dataframe: pandas format dataframe to be oversampled
     :return: oversampled dataframe
@@ -141,7 +144,7 @@ def load_data(database_filepath):
 
     return X, Y, categories
 
-def build_model():
+def build_model(gridsearch=False):
     # Create pipeline with Classifier
     moc = MultiOutputClassifier(RandomForestClassifier())
 
@@ -183,9 +186,57 @@ def save_model(model, model_filepath):
 
 
 def main():
-    if len(sys.argv) == 1:
-        database_filepath = '../data/disaster_data.db'
-        model_filepath = '../models/classifier.pkl'
+
+    messages_filepath = ''
+    categories_filepath = ''
+    database_filepath = ''
+    model_filepath = ''
+    models_path = ''
+
+    basedir = [f for f in os.listdir("../") if isdir(join("../", f))]
+
+    if 'data' in basedir:
+
+        data_path = "../data"
+        data_files = [f for f in os.listdir(data_path) if isfile(join(data_path, f))]
+
+        for file in data_files:
+            if "messages.csv" in file:
+                messages_filepath = f"{data_path}/{file}"
+
+            elif "categories.csv" in file:
+                categories_filepath = f"{data_path}/{file}"
+
+            elif "data.db" in file:
+                database_filepath = f"{data_path}/{file}"
+
+    if 'models' in basedir:
+
+        models_path = "../models"
+        models_files = [f for f in os.listdir(models_path) if isfile(join(models_path, f))]
+
+        for file in models_files:
+
+            if "classifier.pkl" in file:
+                model_filepath = f"{models_path}/{file}"
+
+    if database_filepath:
+        print("Database Path: Ok")
+        print(database_filepath)
+    if messages_filepath:
+        print("Messages Data Path: Ok")
+        print(messages_filepath)
+    if categories_filepath:
+        print("Categories Data Path: Ok")
+        print(categories_filepath)
+    if model_filepath:
+        print("Model Path: Ok")
+        print(model_filepath)
+    else:
+        model_filepath = f"{models_path}/classifier.pkl"
+
+    # Print the system arguments
+    try:
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=42)
@@ -204,7 +255,7 @@ def main():
 
         print('Trained model saved!')
 
-    else:
+    except:
         print('Please provide the filepath of the disaster messages database '\
               'as the first argument and the filepath of the pickle file to '\
               'save the model to as the second argument. \n\nExample: python '\
