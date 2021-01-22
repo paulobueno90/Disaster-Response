@@ -1,3 +1,5 @@
+import os
+from os.path import isfile, join, isdir
 import sys
 import pandas as pd
 from sqlalchemy import create_engine
@@ -56,16 +58,56 @@ def save_data(df, database_filename):
 
 def main():
 
-    # Print the system arguments
-    print(sys.argv)
-    if len(sys.argv) == 1:
+    messages_filepath = ''
+    categories_filepath = ''
+    database_filepath = ''
+    model_filepath = ''
+    data_path = ''
 
-        messages_filepath = '../data/disaster_messages.csv'
-        categories_filepath = '../data/disaster_categories.csv'
-        database_filepath = '../data/disaster_data.db'
+    basedir = [f for f in os.listdir("../") if isdir(join("../", f))]
+
+    if 'data' in basedir:
+
+        data_path = "../data"
+        data_files = [f for f in os.listdir(data_path) if isfile(join(data_path, f))]
+
+        for file in data_files:
+            if "messages.csv" in file:
+                messages_filepath = f"{data_path}/{file}"
+
+            elif "categories.csv" in file:
+                categories_filepath = f"{data_path}/{file}"
+
+            elif "data.db" in file:
+                database_filepath = f"{data_path}/{file}"
+
+    if 'models' in basedir:
+
+        models_path = "../models"
+        models_files = [f for f in os.listdir(models_path) if isfile(join(models_path, f))]
+
+        for file in models_files:
+
+            if "classifier.pkl" in file:
+                model_filepath = f"{models_path}/{file}"
+
+
+    if model_filepath:
+        print("Model Path: Ok")
+        print(model_filepath)
+    if messages_filepath:
+        print("Messages Data Path: Ok")
         print(messages_filepath)
+    if categories_filepath:
+        print("Categories Data Path: Ok")
         print(categories_filepath)
+    if database_filepath:
+        print("Database Path: Ok")
+        print(database_filepath)
+    else:
+        database_filepath = f"{data_path}/disaster_data.db"
 
+    try:
         print('Loading data...\n    MESSAGES: {}\n    CATEGORIES: {}'
               .format(messages_filepath, categories_filepath))
         df = load_data(messages_filepath, categories_filepath)
@@ -78,7 +120,7 @@ def main():
         
         print('Cleaned data saved to database!')
     
-    else:
+    except:
         print('Please provide the filepaths of the messages and categories '\
               'datasets as the first and second argument respectively, as '\
               'well as the filepath of the database to save the cleaned data '\
@@ -89,3 +131,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
