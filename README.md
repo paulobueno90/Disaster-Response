@@ -32,12 +32,12 @@ Python Version: 3.8.5
 
 ## Files and Process
 
-#### Data:
+### Data:
 The dataset is provided by [Appen]("https://appen.com/figure-eight-is-now-appen/") (former Figure Eight):
 
-#### data/disaster_categories.csv: 
+- data/disaster_categories.csv: 
 36 categories possible for the messages
-#### data/disaster_messages.csv: 
+- data/disaster_messages.csv: 
 Disaster response messages
 
 #### Data Processing: 
