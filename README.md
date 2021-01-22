@@ -29,7 +29,7 @@ Python Version: 3.8.5
 - sqlite3
 - textaugment
 
-
+___
 ## Files and Process
 
 ### Data:
@@ -52,7 +52,7 @@ ETL (Extract, Transform, and Load) pipeline that clean and process data from a C
 - Predicts message classifications for the 36 categories (multi-output)
 
 Ps: It was not used GridSearch model, once it improved very litle(0.13%) performance with the oversampled data.
-
+___
 ## Web App: 
 - Web application that classifies messages.
 
